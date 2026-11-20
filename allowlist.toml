@@ -1,0 +1,77 @@
+# Translations the catalog publishes. Every entry is reviewed by hand:
+#
+# - The licence comes from the translation's copr.htm on eBible.org, not from
+#   translations.csv (whose Copyright field does not name the licence).
+# - Only licences that allow redistribution of converted text: public domain,
+#   CC0, CC BY, CC BY-SA. Never "no derivatives".
+# - `versification` lists where the text's verse numbers differ from the KJV,
+#   in Paratext mapping syntax, translation side first; `none` means no KJV
+#   counterpart. Each line must be checked against both texts. The build
+#   refuses a text whose numbering still differs from the KJV.
+#
+# Optional keys override translations.csv: name, language_name.
+
+[[translation]]
+id = "engbsb"
+abbreviation = "BSB"
+licence = "Public Domain"
+attribution = "Berean Standard Bible by BSB Publishing, courtesy of eBible.org."
+reviewed = "2026-11-20"
+
+[[translation]]
+id = "eng-asv"
+abbreviation = "ASV"
+licence = "Public Domain"
+attribution = "Courtesy of eBible.org."
+reviewed = "2026-11-20"
+
+[[translation]]
+id = "engylt"
+abbreviation = "YLT"
+language_name = "English"
+licence = "Public Domain"
+attribution = "Translation by Robert Young, courtesy of eBible.org."
+reviewed = "2026-11-20"
+
+[[translation]]
+id = "engoebus"
+abbreviation = "OEB"
+licence = "Public Domain"
+attribution = "Open English Bible by OpenEnglishBible.org, courtesy of eBible.org."
+notice = "The Old Testament is still being translated; this edition has the books finished so far."
+reviewed = "2026-11-20"
+versification = """
+# Second half of KJV 3 John 1:14.
+3JN 1:15 = none
+# First half of KJV Revelation 13:1.
+REV 12:18 = none
+"""
+
+[[translation]]
+id = "spaRV1909"
+abbreviation = "RV1909"
+licence = "Public Domain"
+attribution = "Courtesy of eBible.org."
+reviewed = "2026-11-20"
+
+[[translation]]
+id = "deu1912"
+abbreviation = "LUT1912"
+licence = "Public Domain"
+attribution = "Translation by Martin Luther, courtesy of eBible.org."
+reviewed = "2026-11-20"
+
+[[translation]]
+id = "tglulb"
+name = "Banal na Bibliya (Unlocked Literal Bible)"
+abbreviation = "ULB"
+licence = "CC BY-SA 4.0"
+attribution = "Tagalog Unlocked Literal Bible © 2018 Door43 World Missions Community, CC BY-SA 4.0, courtesy of eBible.org."
+notice = "Converted for Selah: footnotes and cross references are not shown. Shared under the same licence: https://creativecommons.org/licenses/by-sa/4.0/"
+reviewed = "2026-11-20"
+versification = """
+# Second half of KJV 3 John 1:14.
+3JN 1:15 = none
+# First half of KJV Revelation 13:1.
+REV 12:18 = none
+"""

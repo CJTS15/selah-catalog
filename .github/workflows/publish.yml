@@ -1,0 +1,74 @@
+name: Publish
+
+on:
+  schedule:
+    # Weekly; eBible.org updates texts in place.
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [allowlist.toml, build.py, selah-ref, .github/workflows/publish.yml]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check out Selah at the pinned commit
+        run: |
+          git clone --filter=blob:none https://github.com/CJTS15/selah.git selah
+          git -C selah checkout --detach "$(cat selah-ref)"
+
+      - name: Install SQLite
+        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+
+      - name: Build selah-import
+        run: cargo build --release --locked --manifest-path selah/Cargo.toml -p selah-core --bin selah-import
+
+      - name: Build the KJV reference
+        run: selah/target/release/selah-import selah/data/translations/eng-kjv kjv.sqlite
+
+      - name: Build packages and catalog
+        run: |
+          tag="packages-$(date -u +%Y%m%d-%H%M)"
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          curl -fsSL "https://${GITHUB_REPOSITORY_OWNER,,}.github.io/${GITHUB_REPOSITORY#*/}/catalog.json" -o previous.json || rm -f previous.json
+          python3 build.py \
+            --selah-import selah/target/release/selah-import \
+            --kjv kjv.sqlite \
+            --out out \
+            --url-base "https://github.com/${GITHUB_REPOSITORY}/releases/download/$tag/" \
+            --previous previous.json
+
+      # The release goes up before the catalog, so catalog.json never names
+      # a package that is not downloadable yet.
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          packages=(out/packages/*.selah)
+          if (( ${#packages[@]} )); then
+            gh release create "$TAG" "${packages[@]}" --title "$TAG" \
+              --notes "Packages built by run ${GITHUB_RUN_ID} from Selah $(cat selah-ref)."
+          fi
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: out/site
+
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
