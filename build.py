@@ -201,6 +201,8 @@ def main():
         except Exception as err:  # one broken source must not stop the rest
             failed.append(entry["id"])
             print(f"FAILED {entry['id']}: {err}", file=sys.stderr)
+            # Shown on the GitHub Actions run summary, so a kept-alive failure is noticed.
+            print(f"::warning title=Not rebuilt: {entry['id']}::{err}")
             if entry["id"] in previous:
                 entries.append(previous[entry["id"]])
                 print(f"  keeping the previous {entry['id']} package", file=sys.stderr)

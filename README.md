@@ -21,7 +21,8 @@ A weekly GitHub Actions run (`.github/workflows/publish.yml`):
 
 A translation that fails to download, convert or pass the numbering check
 keeps its previous package, so one broken source never removes a working
-download. Selah checks the size and sha256 of every download and rebuilds
+download. The run stays green but lists each failure as a warning on its
+summary page. Selah checks the size and sha256 of every download and rebuilds
 the database before installing it.
 
 ## Adding a translation
@@ -33,7 +34,10 @@ the database before installing it.
    the licence requires, and the review date.
 3. Run the build locally (below). If the numbering check fails, compare the
    listed verses with the KJV text and add `versification` lines only where
-   both texts were read. Texts with their own numbering scheme (for example
+   both texts were read. The check only catches verse numbers the KJV does
+   not have; it cannot see verses that are numbered alike but in another
+   order (the World English Bible swaps Matthew 23:13 and 14), so also read
+   the text at chapter ends and wherever the verse counts differ. Texts with their own numbering scheme (for example
    Vulgate or Septuagint numbering) wait for versification support in Selah.
 
 ```sh
@@ -42,6 +46,18 @@ cargo build --release --manifest-path ../selah/Cargo.toml -p selah-core --bin se
 python3 build.py --selah-import ../selah/target/release/selah-import --kjv kjv.sqlite \
   --out out --url-base https://example.org/
 ```
+
+## Maintenance
+
+- `selah-ref` must name a commit on Selah's `main` branch (or another branch
+  that is never deleted), or the build cannot check it out. Update it when
+  Selah's importer changes.
+- GitHub turns off scheduled workflows in public repositories after 60 days
+  without repository activity. Packages already published keep working; to
+  resume the weekly refresh, re-enable the workflow under Actions or push a
+  commit.
+- Every run adds a release (about 22 MB). Old releases can be deleted once no
+  published `catalog.json` points at them.
 
 ## Licences
 
